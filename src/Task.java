@@ -3,43 +3,40 @@ import java.util.Objects;
 public class Task {
     protected String name;
     protected String description;
-    protected final int ID;
+    protected int ID;
     protected Status status;
-    protected static int count = 0;
 
-    public Task(String name, String description, Status status) {
-        this.name = name;
-        this.description = description;
-        this.ID = addID();
-        this.status = status;
-    }
-
-    public Task(String name, String description, int ID, Status status) { //конструктор для создания копии
+    public Task(String name, String description, Status status, int ID) { //конструктор для создания копии
         this.name = name;
         this.description = description;
         this.ID = ID;
+        this.status = status;
+    }
+    public Task(String name, String description, Status status) {
+        this.name = name;
+        this.description = description;
         this.status = status;
     }
 
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
-        this.ID = addID();
         status = Status.NEW;
     }
 
     public Task(String name,  Status status) {
         this.name = name;
-        this.ID = addID();
         this.status = status;
     }
 
     public Task(String name) {
         this.name = name;
-        this.ID = addID();
         status = Status.NEW;
     }
 
+    public void setID(int ID) {
+        this.ID = ID;
+    }
 
     public Status getStatus() {
         return status;
@@ -57,10 +54,6 @@ public class Task {
         return name;
     }
 
-    protected int addID() {
-        count++;
-        return count;
-    }
 
     public void setStatus(Status status) {
         this.status = status;
@@ -74,7 +67,7 @@ public class Task {
 
 
     public static boolean check(Task task) {
-        return task != null && !task.getName().isEmpty() && task.getID() > 0;
+        return task!= null && !task.getName().isEmpty() && task.getID() == 0;
     }
 
     @Override

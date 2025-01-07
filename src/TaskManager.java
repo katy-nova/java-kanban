@@ -1,44 +1,62 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TaskManager {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    //??? зачем нужна отдельная мапа с подзадачами, если все подзадачи хранятся в листах в эпике????
     private final HashMap<Integer, Epic> epics = new HashMap<>();
+    private static int count = 0;
+
+    private int addID() {
+        count++;
+        return count;
+    }
 
     public void addTask(Task task) {
         if (Task.check(task)) {
+            task.setID(addID());
             tasks.put(task.getID(), task);
         }
     }
 
+
     public void addSubtask(Subtask subtask) {
         if (Subtask.check(subtask)) {
+            subtask.setID(addID());
             subtasks.put(subtask.getID(), subtask);
-            Epic epic = epics.get(subtask.getEpicId());
-            //??? по идее подзадачу невозможно создать отдельно, значит эпик уже обязан существовать в мапе эпиков???
-            epic.addSubtask(subtask);
+            if (epics.containsKey(subtask.getEpicId())) {
+                Epic epic = epics.get(subtask.getEpicId());
+                epic.addSubtask(subtask.getID());
+                setEpicStatus(epic);
+            }
         }
     }
 
-    public void addEpic(Epic epic) { //??? эпик по умолчанию добавляется пустой????
+
+    public void addEpic(Epic epic) {
         if (Epic.check(epic)) {
+            epic.setID(addID());
             epics.put(epic.getID(), epic);
         }
     }
 
     public void renovateTask(Task task) { //имея одинаковый ID старая задача заменится новой
-        addTask(task);
+        if (tasks.containsKey(task.getID())) {
+            tasks.put(task.getID(), task);
+        }
     }
 
     public void renovateSubtask(Subtask subtask) {
-        Epic epic = epics.get(subtask.getEpicId());
-        epic.deleteSubtask(subtask.getID()); // удаляем старую задачу из эпика, чтобы добавить обновленную
-        addSubtask(subtask);
+        if (subtasks.containsKey(subtask.getID()) && epics.containsKey(subtask.getEpicId())) {
+            subtasks.put(subtask.getID(), subtask);//в эпике ничего перезаписывать не надо, тк ID не изменился
+            setEpicStatus(epics.get(subtask.getEpicId()));
+        }
     }
 
     public void renovateEpic(Epic epic) {
-        addEpic(epic);
+        if (epics.containsKey(epic.getID())) {
+            epics.put(epic.getID(), epic);
+        }
     }
 
     public void clearTasks() {
@@ -67,28 +85,28 @@ public class TaskManager {
         }
     }
 
-    public String printAllTasks() {
-        return tasks.toString();
+    public HashMap<Integer,Task> printAllTasks() {
+        return tasks;
     }
 
-    public String printAllSubtasks() {
-        return subtasks.toString();
+    public HashMap<Integer, Subtask> printAllSubtasks() {
+        return subtasks;
     }
 
-    public String printAllEpics() {
-        return epics.toString();
+    public HashMap<Integer, Epic> printAllEpics() {
+        return epics;
     }
 
     public Task getTask(int ID) {
-        return tasks.getOrDefault(ID, null);
+        return tasks.get(ID);
     }
 
     public Subtask getSubtask(int ID) {
-        return subtasks.getOrDefault(ID, null);
+        return subtasks.get(ID);
     }
 
     public Epic getEpic(int ID) {
-        return epics.getOrDefault(ID, null);
+        return epics.get(ID);
     }
 
     public void deleteTask(int ID) {
@@ -101,6 +119,7 @@ public class TaskManager {
             Epic epic = epics.get(subtask.getEpicId());
             subtasks.remove(ID);
             epic.deleteSubtask(ID); // удаляем подзадачу из эпика
+            setEpicStatus(epic);
         }
     }
 
@@ -116,5 +135,34 @@ public class TaskManager {
 
     }
 
-
+    private void setEpicStatus(Epic epic) {
+        boolean isNew = true;
+        boolean isDone = true;
+        int epicId = epic.getID();
+        ArrayList<Subtask> epicSubtasks = new ArrayList<>(); // создаем пустой список для задач нужного эпика
+        for (Subtask subtask: subtasks.values()) {
+            if (subtask.getEpicId() == epicId) {
+                epicSubtasks.add(subtask); //добвляем все подзадачи по ID из мапы с подзадачами
+            }
+        }
+        for (Subtask epicSubtask: epicSubtasks) {
+            if (epicSubtask.getStatus() == Status.IN_PROGRESS) { // если хотя бы у 1 задачи статус "в процессе"
+                epic.setStatus(Status.IN_PROGRESS); // то весь эпик в статусе "в процессе"
+                return;
+            } else if (epicSubtask.getStatus() == Status.NEW) {
+                isDone = false; //если хотя бы у 1 задачи статус новая, то эпик не может быть done
+            } else if (epicSubtask.getStatus() == Status.DONE) {
+                isNew = false; //если хотя бы у 1 задачи статус done, то эпик не может быть новым
+            }
+            if (!isNew && !isDone) {// если есть хотя бы по 1 задаче new и done, устанавливаем статус и выходим
+                epic.setStatus(Status.IN_PROGRESS); // дальше проверять нет смысла
+                return;
+            }
+        }
+        if (isNew) {
+            epic.setStatus(Status.NEW);
+        } else {
+            epic.setStatus(Status.DONE);
+        }
+    }
 }
