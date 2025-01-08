@@ -40,22 +40,24 @@ public class TaskManager {
         }
     }
 
-    public void renovateTask(Task task) { //имея одинаковый ID старая задача заменится новой
+    public void updateTask(Task task) { //имея одинаковый ID старая задача заменится новой
         if (tasks.containsKey(task.getID())) {
             tasks.put(task.getID(), task);
         }
     }
 
-    public void renovateSubtask(Subtask subtask) {
+    public void updateSubtask(Subtask subtask) {
         if (subtasks.containsKey(subtask.getID()) && epics.containsKey(subtask.getEpicId())) {
             subtasks.put(subtask.getID(), subtask);//в эпике ничего перезаписывать не надо, тк ID не изменился
             setEpicStatus(epics.get(subtask.getEpicId()));
         }
     }
 
-    public void renovateEpic(Epic epic) {
-        if (epics.containsKey(epic.getID())) {
-            epics.put(epic.getID(), epic);
+    public void updateEpic(Epic newEpic) {
+        if (epics.containsKey(newEpic.getID())) {
+            Epic epic = epics.get(newEpic.getID());
+            epic.setName(newEpic.getName());
+            epic.setDescription(newEpic.getDescription());
         }
     }
 
@@ -69,6 +71,7 @@ public class TaskManager {
         if (!epics.isEmpty()) {
             for (Epic epic : epics.values()) { // очищаем каждый эпик
                 epic.clearEpic();
+                epic.setStatus(Status.NEW);
             }
         }
         if (!subtasks.isEmpty()) {
@@ -85,16 +88,16 @@ public class TaskManager {
         }
     }
 
-    public HashMap<Integer,Task> printAllTasks() {
-        return tasks;
+    public ArrayList<Task> getTasks() {
+        return new ArrayList<>(tasks.values());
     }
 
-    public HashMap<Integer, Subtask> printAllSubtasks() {
-        return subtasks;
+    public ArrayList<Subtask> getSubtasks() {
+        return new ArrayList<>(subtasks.values());
     }
 
-    public HashMap<Integer, Epic> printAllEpics() {
-        return epics;
+    public ArrayList<Epic> getEpics() {
+        return new ArrayList<>(epics.values());
     }
 
     public Task getTask(int ID) {
