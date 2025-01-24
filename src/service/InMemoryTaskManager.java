@@ -1,17 +1,32 @@
+package service;
+
+import model.Epic;
+import model.Status;
+import model.Subtask;
+import model.Task;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class TaskManager {
+public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private static int count = 0;
+    private final HistoryManager historyManager =  Managers.getDefaultHistoryManager();
 
-    private int addID() {
+    public int addID() {
         count++;
         return count;
     }
 
+
+    @Override
+    public ArrayList<Task> getHistory() {
+        return historyManager.getHistory();
+    }
+
+    @Override
     public void addTask(Task task) {
         if (Task.check(task)) {
             task.setID(addID());
@@ -20,6 +35,7 @@ public class TaskManager {
     }
 
 
+    @Override
     public void addSubtask(Subtask subtask) {
         if (Subtask.check(subtask)) {
             subtask.setID(addID());
@@ -33,6 +49,7 @@ public class TaskManager {
     }
 
 
+    @Override
     public void addEpic(Epic epic) {
         if (Epic.check(epic)) {
             epic.setID(addID());
@@ -40,12 +57,14 @@ public class TaskManager {
         }
     }
 
+    @Override
     public void updateTask(Task task) { //имея одинаковый ID старая задача заменится новой
         if (tasks.containsKey(task.getID())) {
             tasks.put(task.getID(), task);
         }
     }
 
+    @Override
     public void updateSubtask(Subtask subtask) {
         if (subtasks.containsKey(subtask.getID()) && epics.containsKey(subtask.getEpicId())) {
             subtasks.put(subtask.getID(), subtask);//в эпике ничего перезаписывать не надо, тк ID не изменился
@@ -53,6 +72,7 @@ public class TaskManager {
         }
     }
 
+    @Override
     public void updateEpic(Epic newEpic) {
         if (epics.containsKey(newEpic.getID())) {
             Epic epic = epics.get(newEpic.getID());
@@ -61,12 +81,14 @@ public class TaskManager {
         }
     }
 
+    @Override
     public void clearTasks() {
         if (!tasks.isEmpty()) {
             tasks.clear();
         }
     }
 
+    @Override
     public void clearSubtasks() {
         if (!epics.isEmpty()) {
             for (Epic epic : epics.values()) { // очищаем каждый эпик
@@ -79,6 +101,7 @@ public class TaskManager {
         }
     }
 
+    @Override
     public void clearEpics() {
         if (!epics.isEmpty()) {
             epics.clear();
@@ -88,34 +111,45 @@ public class TaskManager {
         }
     }
 
+    @Override
     public ArrayList<Task> getTasks() {
         return new ArrayList<>(tasks.values());
     }
 
+    @Override
     public ArrayList<Subtask> getSubtasks() {
         return new ArrayList<>(subtasks.values());
     }
 
+    @Override
     public ArrayList<Epic> getEpics() {
         return new ArrayList<>(epics.values());
     }
 
+    @Override
     public Task getTask(int ID) {
+        historyManager.addTask(tasks.get(ID));
         return tasks.get(ID);
     }
 
+    @Override
     public Subtask getSubtask(int ID) {
+        historyManager.addTask(subtasks.get(ID));
         return subtasks.get(ID);
     }
 
+    @Override
     public Epic getEpic(int ID) {
+        historyManager.addTask(epics.get(ID));
         return epics.get(ID);
     }
 
+    @Override
     public void deleteTask(int ID) {
         tasks.remove(ID);
     }
 
+    @Override
     public void deleteSubtask(int ID) {
         if (subtasks.containsKey(ID)) {
             Subtask subtask = subtasks.get(ID); // достаем подзадачу, чтобы получить ID эпика
@@ -126,6 +160,7 @@ public class TaskManager {
         }
     }
 
+    @Override
     public void deleteEpic(int ID) {
         if (epics.containsKey(ID)) {
             for (Subtask subtask: subtasks.values()) {
@@ -138,7 +173,7 @@ public class TaskManager {
 
     }
 
-    private void setEpicStatus(Epic epic) {
+    public void setEpicStatus(Epic epic) {
         boolean isNew = true;
         boolean isDone = true;
         int epicId = epic.getID();

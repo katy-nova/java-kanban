@@ -1,3 +1,5 @@
+package model;
+
 import java.util.Objects;
 
 public class Task {
@@ -32,6 +34,10 @@ public class Task {
     public Task(String name) {
         this.name = name;
         status = Status.NEW;
+    }
+
+    public Task clone() {
+        return new Task(this.name, this.description, this.status, this.ID);
     }
 
     public void setID(int ID) {
@@ -74,12 +80,12 @@ public class Task {
 
 
     public static boolean check(Task task) {
-        return task!= null && !task.getName().isEmpty() && task.getID() == 0;
+        return task!= null && !task.getName().isEmpty();
     }
 
     @Override
     public String toString() {
-        return "Task{'name='" + name + ", 'ID'=" + ID + ", 'Status'=" + status + "}";
+        return "model.Task{'name='" + name + ", 'ID'=" + ID + ", 'model.Status'=" + status + "}";
     }
 
     @Override

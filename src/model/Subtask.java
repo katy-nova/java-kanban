@@ -1,4 +1,6 @@
-public class Subtask extends Task{
+package model;
+
+public class Subtask extends Task {
     protected int epicId;
 
     public Subtask(String name, String description, Status status, int epicId) {
@@ -24,6 +26,11 @@ public class Subtask extends Task{
     public Subtask(String name, String description, int ID, Status status, int epicId) {
         super(name, description, status, ID);
         this.epicId = epicId;
+    }
+
+    @Override
+    public Subtask clone() {
+        return new Subtask(this.name, this.description, this.ID, this.status, this.epicId);
     }
 
     public int getEpicId() {

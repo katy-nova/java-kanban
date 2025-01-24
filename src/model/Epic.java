@@ -1,6 +1,8 @@
+package model;
+
 import java.util.ArrayList;
 
-public class Epic extends Task{
+public class Epic extends Task {
     private final ArrayList<Integer> subtasks = new ArrayList<>();
 
 
@@ -17,11 +19,14 @@ public class Epic extends Task{
     }
 
     public ArrayList<Integer> getSubtasks() {
-        return subtasks;
+        return new ArrayList<>(subtasks);
     }
 
 
     public void addSubtask(int subtaskID) {
+        if (subtaskID == ID) { // если добавляем эпик сам в себя, он не добавляется
+            return;
+        }
         for (Integer ID: subtasks) {
             if (ID == subtaskID) {
                 return;
@@ -47,6 +52,15 @@ public class Epic extends Task{
 
     @Override
     public String toString() {
-        return "Epic{'name='" + name + ", 'ID'=" + ID +", 'Status'="+ status + "\n Subtasks:" + subtasks + "}";
+        return "model.Epic{'name='" + name + ", 'ID'=" + ID +", 'model.Status'="+ status + "\n Subtasks:" + subtasks + "}";
+    }
+
+    @Override
+    public Epic clone() {
+        Epic epic = new Epic(this.name, this.description, this.status, this.ID);
+        for (Integer subtask : subtasks) {
+            epic.addSubtask(subtask);
+        }
+        return epic;
     }
 }
