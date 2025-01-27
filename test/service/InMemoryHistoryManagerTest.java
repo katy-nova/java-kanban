@@ -4,8 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.HistoryManager;
 import service.Managers;
-
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +21,7 @@ class InMemoryHistoryManagerTest {
     void add() {
         Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW );
         historyManager.addTask(task);
-        final ArrayList<Task> history = historyManager.getHistory();
+        final List<Task> history = historyManager.getHistory();
         assertNotNull(history, "История не пустая.");
         assertEquals(1, history.size(), "История не пустая.");
     }
@@ -32,9 +31,9 @@ class InMemoryHistoryManagerTest {
         Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW );
         Task clone = task.clone();
         historyManager.addTask(task);
-        final ArrayList<Task> history = historyManager.getHistory();
+        final List<Task> history = historyManager.getHistory();
         task.renovateTask("Change", "Change", Status.DONE);
-        assertEquals(historyManager.getHistory().get(0), clone);
-        assertNotEquals(historyManager.getHistory().get(0), task);
+        assertEquals(historyManager.getHistory().getFirst(), clone);
+        assertNotEquals(historyManager.getHistory().getFirst(), task);
     }
 }
