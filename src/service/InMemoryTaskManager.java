@@ -200,7 +200,7 @@ public class InMemoryTaskManager implements TaskManager {
             } else if (epicSubtask.getStatus() == Status.DONE) {
                 isNew = false; //если хотя бы у 1 задачи статус done, то эпик не может быть новым
             }
-            if (!isNew && !isDone) {// если есть хотя бы по 1 задаче new и done, устанавливаем статус и выходим
+            if (!isNew && !isDone) { // если есть хотя бы по 1 задаче new и done, устанавливаем статус и выходим
                 epic.setStatus(Status.IN_PROGRESS); // дальше проверять нет смысла
                 return;
             }
