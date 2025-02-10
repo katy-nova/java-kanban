@@ -18,8 +18,8 @@ public class InMemoryHistoryManager implements HistoryManager {
         return handMadeLinkedMap.get(task.getID());
     }
 
-    public Node getNode(int ID) { // вспомогательный метод
-        return handMadeLinkedMap.get(ID);
+    public Node getNode(int id) { // вспомогательный метод
+        return handMadeLinkedMap.get(id);
     }
 
     // Метод для добавления элемента в конец списка

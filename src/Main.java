@@ -70,7 +70,7 @@ public class Main {
         System.out.println(taskManager.getSubtasks());
         System.out.println();
         model.Subtask copy = new model.Subtask("new name","desc", 5, model.Status.DONE, epic.getID());
-        // создаем обновленную подзадачу с таким же ID
+        // создаем обновленную подзадачу с таким же id
         taskManager.updateSubtask(copy); // обновляем задачу
         System.out.println("DONE" + taskManager.getEpics());
         System.out.println();

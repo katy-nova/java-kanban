@@ -9,8 +9,8 @@ public class Epic extends Task {
         super(name, description);
     }
 
-    public Epic(String name, String description, Status status, int ID) {
-        super(name, description, status, ID);
+    public Epic(String name, String description, Status status, int id) {
+        super(name, description, status, id);
     }
 
     public Epic(String name) {
@@ -22,20 +22,20 @@ public class Epic extends Task {
     }
 
     public void addSubtask(int subtaskID) {
-        if (subtaskID == ID) { // если добавляем эпик сам в себя, он не добавляется
+        if (subtaskID == id) { // если добавляем эпик сам в себя, он не добавляется
             return;
         }
-        for (Integer ID : subtasks) {
-            if (ID == subtaskID) {
+        for (Integer id : subtasks) {
+            if (id == subtaskID) {
                 return;
             }
         }
         subtasks.add(subtaskID);
     }
 
-    public void deleteSubtask(int ID) {
+    public void deleteSubtask(int id) {
         for (int i = 0; i < subtasks.size(); i++) {
-            if (subtasks.get(i) == ID) {
+            if (subtasks.get(i) == id) {
                 subtasks.remove(i);
             }
         }
@@ -49,12 +49,12 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "model.Epic{'name='" + name + ", 'ID'=" + ID + ", 'model.Status'=" + status + "\n Subtasks:" + subtasks + "}";
+        return "model.Epic{'name='" + name + ", 'id'=" + id + ", 'model.Status'=" + status + "\n Subtasks:" + subtasks + "}";
     }
 
     @Override
     public Epic clone() {
-        Epic epic = new Epic(this.name, this.description, this.status, this.ID);
+        Epic epic = new Epic(this.name, this.description, this.status, this.id);
         for (Integer subtask : subtasks) {
             epic.addSubtask(subtask);
         }

@@ -33,17 +33,17 @@ public interface TaskManager {
 
     List<Epic> getEpics();
 
-    Task getTask(int ID);
+    Task getTask(int id);
 
-    Subtask getSubtask(int ID);
+    Subtask getSubtask(int id);
 
-    Epic getEpic(int ID);
+    Epic getEpic(int id);
 
-    void deleteTask(int ID);
+    void deleteTask(int id);
 
-    void deleteSubtask(int ID);
+    void deleteSubtask(int id);
 
-    void deleteEpic(int ID);
+    void deleteEpic(int id);
 
     ArrayList<Task> getHistory();
 
