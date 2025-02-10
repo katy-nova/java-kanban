@@ -1,10 +1,11 @@
-package service;
 
 import model.Epic;
 import model.Status;
 import model.Subtask;
 import model.Task;
 import org.junit.jupiter.api.Test;
+import service.Managers;
+import service.TaskManager;
 
 import java.util.List;
 
@@ -13,6 +14,25 @@ import static org.junit.jupiter.api.Assertions.*;
 class InMemoryTaskManagerTest {
 
     TaskManager taskManager = Managers.getDefault();
+
+    @Test
+    void shouldDeleteSubtask() {
+        Epic epic = new Epic("name", "description");
+        taskManager.addEpic(epic);
+        Subtask subtask1 = new Subtask("name1", "description", epic.getID());
+        Subtask subtask2 = new Subtask("name2", "description", epic.getID());
+        Subtask subtask3 = new Subtask("name3", "description", epic.getID());
+        taskManager.addSubtask(subtask1);
+        taskManager.addSubtask(subtask2);
+        taskManager.addSubtask(subtask3);
+        assertEquals(1, taskManager.getEpics().size());
+        assertEquals(3, taskManager.getSubtasks().size());
+        taskManager.deleteSubtask(subtask2.getID());
+        assertEquals(2, taskManager.getSubtasks().size());
+        assertEquals(2, epic.getSubtasks().size());
+        taskManager.deleteEpic(epic.getID());
+        assertTrue(taskManager.getEpics().isEmpty());
+    }
 
     @Test
     void addNewTask() {
@@ -89,6 +109,4 @@ class InMemoryTaskManagerTest {
         final List<Task> tasks = taskManager.getTasks();
         assertEquals(tasks.size(), 2);
     }
-
-
 }
