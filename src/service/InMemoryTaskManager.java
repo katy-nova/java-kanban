@@ -4,17 +4,16 @@ import model.Epic;
 import model.Status;
 import model.Subtask;
 import model.Task;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private static int count = 0;
-    private final HistoryManager historyManager =  Managers.getDefaultHistoryManager();
+    private final HistoryManager historyManager = Managers.getDefaultHistoryManager();
 
     public int addID() {
         count++;
@@ -84,7 +83,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void clearTasks() {
         if (!tasks.isEmpty()) {
-            for (Integer ID: tasks.keySet()) {
+            for (Integer ID : tasks.keySet()) {
                 historyManager.remove(ID); // не слишком ли усложняется метод с добавлением цикла?
             }
             tasks.clear();
@@ -101,7 +100,7 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
         if (!subtasks.isEmpty()) {
-            for (Integer ID: subtasks.keySet()) {
+            for (Integer ID : subtasks.keySet()) {
                 historyManager.remove(ID);
             }
             subtasks.clear(); // очищаем мапу
@@ -173,7 +172,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteEpic(int ID) {
         if (epics.containsKey(ID)) {
             ArrayList<Integer> subtasksIDs = epics.get(ID).getSubtasks();
-            for (Integer subtaskId: subtasksIDs) {
+            for (Integer subtaskId : subtasksIDs) {
                 subtasks.remove(subtaskId);
                 historyManager.remove(subtaskId);
             }
@@ -188,12 +187,12 @@ public class InMemoryTaskManager implements TaskManager {
         boolean isDone = true;
         int epicId = epic.getID();
         ArrayList<Subtask> epicSubtasks = new ArrayList<>(); // создаем пустой список для задач нужного эпика
-        for (Subtask subtask: subtasks.values()) {
+        for (Subtask subtask : subtasks.values()) {
             if (subtask.getEpicId() == epicId) {
                 epicSubtasks.add(subtask); //добвляем все подзадачи по ID из мапы с подзадачами
             }
         }
-        for (Subtask epicSubtask: epicSubtasks) {
+        for (Subtask epicSubtask : epicSubtasks) {
             if (epicSubtask.getStatus() == Status.IN_PROGRESS) { // если хотя бы у 1 задачи статус "в процессе"
                 epic.setStatus(Status.IN_PROGRESS); // то весь эпик в статусе "в процессе"
                 return;

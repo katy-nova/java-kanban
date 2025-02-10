@@ -14,6 +14,7 @@ public class Task {
         this.ID = ID;
         this.status = status;
     }
+
     public Task(String name, String description, Status status) {
         this.name = name;
         this.description = description;
@@ -26,7 +27,7 @@ public class Task {
         status = Status.NEW;
     }
 
-    public Task(String name,  Status status) {
+    public Task(String name, Status status) {
         this.name = name;
         this.status = status;
     }
@@ -80,7 +81,7 @@ public class Task {
 
 
     public static boolean check(Task task) {
-        return task!= null && !task.getName().isEmpty();
+        return task != null && !task.getName().isEmpty();
     }
 
     @Override

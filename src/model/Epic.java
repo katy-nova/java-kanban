@@ -5,7 +5,6 @@ import java.util.ArrayList;
 public class Epic extends Task {
     private final ArrayList<Integer> subtasks = new ArrayList<>();
 
-
     public Epic(String name, String description) {
         super(name, description);
     }
@@ -22,12 +21,11 @@ public class Epic extends Task {
         return new ArrayList<>(subtasks);
     }
 
-
     public void addSubtask(int subtaskID) {
         if (subtaskID == ID) { // если добавляем эпик сам в себя, он не добавляется
             return;
         }
-        for (Integer ID: subtasks) {
+        for (Integer ID : subtasks) {
             if (ID == subtaskID) {
                 return;
             }
@@ -37,7 +35,7 @@ public class Epic extends Task {
 
     public void deleteSubtask(int ID) {
         for (int i = 0; i < subtasks.size(); i++) {
-            if (subtasks.get(i) == ID){
+            if (subtasks.get(i) == ID) {
                 subtasks.remove(i);
             }
         }
@@ -49,10 +47,9 @@ public class Epic extends Task {
         }
     }
 
-
     @Override
     public String toString() {
-        return "model.Epic{'name='" + name + ", 'ID'=" + ID +", 'model.Status'="+ status + "\n Subtasks:" + subtasks + "}";
+        return "model.Epic{'name='" + name + ", 'ID'=" + ID + ", 'model.Status'=" + status + "\n Subtasks:" + subtasks + "}";
     }
 
     @Override

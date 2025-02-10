@@ -36,7 +36,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     void addNewTask() {
-        Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW );
+        Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
         Task copy = task.clone();
 
         assertNotNull(copy, "Задача не найдена.");
@@ -102,7 +102,7 @@ class InMemoryTaskManagerTest {
         с уже указанным ID, то тогда нужно проверять, что такого ID не существует во всех трех мапах? Что делать если
         он будет не уникален? Присвоить задаче новый ID или перезаписать? В чем тогда заключается отсутствие
         конфликтности?*/
-        Task task1 = new Task("Test addNewTask", "Test addNewTask description", Status.NEW );
+        Task task1 = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
         Task task2 = new Task("Task", "Description", Status.DONE, 2);
         taskManager.addTask(task1);
         taskManager.addTask(task2);

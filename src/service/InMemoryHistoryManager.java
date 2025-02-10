@@ -1,10 +1,11 @@
 package service;
 
 import model.Task;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class InMemoryHistoryManager implements HistoryManager{
+public class InMemoryHistoryManager implements HistoryManager {
 
     //private final LinkedHashMap<Integer,Task> history = new LinkedHashMap<>();
     private final HashMap<Integer, Node> handMadeLinkedMap = new HashMap<>();
