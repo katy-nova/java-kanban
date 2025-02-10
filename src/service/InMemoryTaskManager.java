@@ -33,7 +33,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-
     @Override
     public void addSubtask(Subtask subtask) {
         if (Subtask.check(subtask)) {
