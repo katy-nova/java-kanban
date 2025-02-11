@@ -7,7 +7,6 @@ import java.util.HashMap;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    //private final LinkedHashMap<Integer,Task> history = new LinkedHashMap<>();
     private final HashMap<Integer, Node> handMadeLinkedMap = new HashMap<>();
 
     private Node head;   // первый узел списка
@@ -77,14 +76,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void remove(int id) {
         removeNode(getNode(id));
     }
-
-//    @Override
-//    public void addTask(Task task) {
-//        if (Task.check(task)) {
-//            history.remove(task.getID());
-//            history.put(task.getID(),task.clone());
-//        }
-//    }
 
     @Override
     public void addTask(Task task) {
