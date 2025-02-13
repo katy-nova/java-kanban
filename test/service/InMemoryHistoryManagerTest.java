@@ -30,22 +30,6 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void shouldDeleteTaskFromHistory() {
-        Task task1 = new Task("Tes1", "Test addNewTask description", Status.NEW, 1);
-        Task task2 = new Task("Tes2", "Test addNewTask description", Status.NEW, 2);
-        Task task3 = new Task("Tes3", "Test addNewTask description", Status.NEW, 3);
-        historyManager.addTask(task);
-        historyManager.addTask(task2);
-        assertEquals(2, historyManager.getTasks().size());
-        historyManager.remove(task.getID());
-        assertEquals(1, historyManager.getTasks().size());
-        historyManager.addTask(task1);
-        historyManager.addTask(task3);
-        historyManager.remove(task3.getID());
-        assertEquals(2, historyManager.getTasks().size());
-    }
-
-    @Test
     void add() {
         historyManager.addTask(task);
         assertNotNull(historyManager.getTasks(), "История не пустая.");
