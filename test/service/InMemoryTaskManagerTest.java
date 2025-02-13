@@ -35,6 +35,27 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    void shouldGetCorrectHistory() {
+        Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
+        taskManager.addTask(task);
+        Epic epic = new Epic("name", "description");
+        taskManager.addEpic(epic);
+        Subtask subtask1 = new Subtask("name1", "description", epic.getID());
+        Subtask subtask2 = new Subtask("name2", "description", epic.getID());
+        Subtask subtask3 = new Subtask("name3", "description", epic.getID());
+        taskManager.addSubtask(subtask1);
+        taskManager.addSubtask(subtask2);
+        taskManager.addSubtask(subtask3);
+        taskManager.getTask(task.getID());
+        taskManager.getSubtask(subtask1.getID());
+        taskManager.getSubtask(subtask2.getID());
+        taskManager.getSubtask(subtask3.getID());
+        System.out.println(taskManager.getHistory());
+        taskManager.getSubtask(subtask2.getID());
+        System.out.println(taskManager.getHistory());
+    }
+
+    @Test
     void addNewTask() {
         Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
         Task copy = task.clone();

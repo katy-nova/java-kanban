@@ -12,26 +12,25 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node head;   // первый узел списка
     private Node tail;   // последний узел списка
 
-    @Override
-    public Node getNode(Task task) { // вспомогательный метод
+
+    private Node getNode(Task task) { // вспомогательный метод
         return handMadeLinkedMap.get(task.getID());
     }
 
-    public Node getNode(int id) { // вспомогательный метод
+    private Node getNode(int id) { // вспомогательный метод
         return handMadeLinkedMap.get(id);
     }
 
     // Метод для добавления элемента в конец списка
-    @Override
-    public void linkLast(Task task) {
+    private void linkLast(Task task) {
         Node newNode = new Node(null, task.clone(), null); // Создаем новый узел
 
         if (head == null) {
             head = newNode;   // новый узел становится и головой, и хвостом
             tail = newNode;
         } else {
-            tail.next = newNode;  // новый узел становится следующим после текущего хвоста
-            newNode.prev = tail;  // предыдущим для нового узла становится текущий хвост
+            tail.setNext(newNode);  // новый узел становится следующим после текущего хвоста
+            newNode.setPrev(tail); // предыдущим для нового узла становится текущий хвост
             tail = newNode;       // новый узел становится новым хвостом
         }
         handMadeLinkedMap.put(task.getID(), newNode); // кладем в мапу готовый узел
@@ -42,33 +41,32 @@ public class InMemoryHistoryManager implements HistoryManager {
         ArrayList<Task> tasks = new ArrayList<>();
         Node currentNode = head; // голова становится текущим узлом
         while (currentNode != null) {
-            tasks.add(currentNode.task); // добавляем текущий узел в список
-            currentNode = currentNode.next; // следующий узел от текущего становится текущим
+            tasks.add(currentNode.getTask()); // добавляем текущий узел в список
+            currentNode = currentNode.getNext(); // следующий узел от текущего становится текущим
         }
         return tasks;
     }
 
-    @Override
-    public void removeNode(Node node) {
+    private void removeNode(Node node) {
         if (node == null) { // если пытаемся удалить задачу, которая не попадалав в историю
             return;
         }
-        if (node.prev != null && node.next != null) { // если есть и предыдущий, и следующий
-            Node previous = node.prev; // достаем предыдущий
-            Node next = node.next; // достаем следующий
-            previous.next = next; // связываем
-            next.prev = previous;
-        } else if (node.prev != null) { // если нет следующего
-            node.prev.next = null; // предыдущий становится хвостом
-            tail = node.prev;
-        } else if (node.next != null) { // если нет предыдущего
-            node.next.prev = null; // следующий становится головой
-            head = node.next;
+        if (node.getPrev() != null && node.getNext() != null) { // если есть и предыдущий, и следующий
+            Node previous = node.getPrev(); // достаем предыдущий
+            Node next = node.getNext(); // достаем следующий
+            previous.setNext(next); // связываем
+            next.setPrev(previous);
+        } else if (node.getPrev() != null) { // если нет следующего
+            node.getPrev().setNext(null); // предыдущий становится хвостом
+            tail = node.getPrev();
+        } else if (node.getNext() != null) { // если нет предыдущего
+            node.getPrev().setNext(null); // следующий становится головой
+            head = node.getNext();
         } else { // если этот узел был единственный
             head = null;
             tail = null;
         }
-        handMadeLinkedMap.remove(node.task.getID()); // безболезненно удаляем нужный узел
+        handMadeLinkedMap.remove(node.getTask().getID()); // безболезненно удаляем нужный узел
     }
 
 

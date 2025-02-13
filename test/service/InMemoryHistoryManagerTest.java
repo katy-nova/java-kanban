@@ -11,23 +11,6 @@ class InMemoryHistoryManagerTest {
     HistoryManager historyManager = Managers.getDefaultHistoryManager();
     Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
 
-
-    @Test
-    void testingHandMadeLinkingMap() {
-        Task task1 = new Task("Tes1", "Test addNewTask description", Status.NEW, 1);
-        Task task2 = new Task("Tes2", "Test addNewTask description", Status.NEW, 2);
-        Task task3 = new Task("Tes3", "Test addNewTask description", Status.NEW, 3);
-        Task task4 = new Task("Tes4", "Test addNewTask description", Status.NEW, 4);
-        historyManager.linkLast(task);
-        historyManager.linkLast(task1);
-        historyManager.linkLast(task2);
-        historyManager.linkLast(task3);
-        historyManager.linkLast(task4);
-        System.out.println(historyManager.getTasks());
-        historyManager.removeNode(historyManager.getNode(task2));
-        System.out.println(historyManager.getTasks());
-    }
-
     @Test
     void shouldRewriteSameTaskAndSaveWordOrder() {
         Task task1 = new Task("Tes1", "Test addNewTask description", Status.NEW, 1);
