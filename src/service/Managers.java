@@ -1,6 +1,6 @@
 package service;
 
-public final class Managers  {
+public final class Managers {
 
     private Managers() {
 

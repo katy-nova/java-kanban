@@ -5,15 +5,16 @@ import java.util.Objects;
 public class Task {
     protected String name;
     protected String description;
-    protected int ID;
+    protected int id;
     protected Status status;
 
-    public Task(String name, String description, Status status, int ID) { //конструктор для создания копии
+    public Task(String name, String description, Status status, int id) { //конструктор для создания копии
         this.name = name;
         this.description = description;
-        this.ID = ID;
+        this.id = id;
         this.status = status;
     }
+
     public Task(String name, String description, Status status) {
         this.name = name;
         this.description = description;
@@ -26,7 +27,7 @@ public class Task {
         status = Status.NEW;
     }
 
-    public Task(String name,  Status status) {
+    public Task(String name, Status status) {
         this.name = name;
         this.status = status;
     }
@@ -37,11 +38,11 @@ public class Task {
     }
 
     public Task clone() {
-        return new Task(this.name, this.description, this.status, this.ID);
+        return new Task(this.name, this.description, this.status, this.id);
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setID(int id) {
+        this.id = id;
     }
 
     public Status getStatus() {
@@ -49,7 +50,7 @@ public class Task {
     }
 
     public int getID() {
-        return ID;
+        return id;
     }
 
     public String getDescription() {
@@ -80,12 +81,12 @@ public class Task {
 
 
     public static boolean check(Task task) {
-        return task!= null && !task.getName().isEmpty();
+        return task != null && !task.getName().isEmpty();
     }
 
     @Override
     public String toString() {
-        return "model.Task{'name='" + name + ", 'ID'=" + ID + ", 'model.Status'=" + status + "}";
+        return "model.Task{'name='" + name + ", 'id'=" + id + ", 'model.Status'=" + status + "}";
     }
 
     @Override
@@ -93,11 +94,11 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return ID == task.ID && Objects.equals(name, task.name) && Objects.equals(description, task.description) && status == task.status;
+        return id == task.id && Objects.equals(name, task.name) && Objects.equals(description, task.description) && status == task.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, ID, status);
+        return Objects.hash(name, description, id, status);
     }
 }
