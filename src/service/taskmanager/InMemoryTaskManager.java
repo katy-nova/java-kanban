@@ -1,12 +1,12 @@
-package service;
+package service.taskmanager;
 
 import model.Epic;
 import model.Status;
 import model.Subtask;
 import model.Task;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import service.Managers;
+import service.history.HistoryManager;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
@@ -20,6 +20,14 @@ public class InMemoryTaskManager implements TaskManager {
         return count;
     }
 
+    public void setCount(int newCount) {
+        count = newCount;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
     @Override
     public ArrayList<Task> getHistory() {
         return historyManager.getTasks();
@@ -28,7 +36,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addTask(Task task) {
         if (Task.check(task)) {
-            task.setID(addID());
+            if (task.getID() == 0) {
+                task.setID(addID());
+            }
             tasks.put(task.getID(), task);
         }
     }
@@ -36,7 +46,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addSubtask(Subtask subtask) {
         if (Subtask.check(subtask)) {
-            subtask.setID(addID());
+            if (subtask.getID() == 0) {
+                subtask.setID(addID());
+            }
             subtasks.put(subtask.getID(), subtask);
             if (epics.containsKey(subtask.getEpicId())) {
                 Epic epic = epics.get(subtask.getEpicId());
@@ -50,7 +62,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addEpic(Epic epic) {
         if (Epic.check(epic)) {
-            epic.setID(addID());
+            if (epic.getID() == 0) {
+                epic.setID(addID());
+            }
             epics.put(epic.getID(), epic);
         }
     }
@@ -179,6 +193,14 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.remove(id);
         }
 
+    }
+
+    public int findMaxID() { // метод, который находит максимальный айди, чтобы потом присвоить счетчику его значение
+        Set<Integer> ids = new HashSet<>();
+        ids.addAll(tasks.keySet());
+        ids.addAll(subtasks.keySet());
+        ids.addAll(epics.keySet());
+        return Collections.max(ids);
     }
 
     public void setEpicStatus(Epic epic) {

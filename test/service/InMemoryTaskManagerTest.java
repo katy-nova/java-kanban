@@ -5,7 +5,7 @@ import model.Subtask;
 import model.Task;
 import org.junit.jupiter.api.Test;
 import service.Managers;
-import service.TaskManager;
+import service.taskmanager.TaskManager;
 
 import java.util.List;
 

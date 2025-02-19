@@ -15,6 +15,14 @@ public class Task {
         this.status = status;
     }
 
+    public Task(String string) {
+        String[] parts = string.split(",");
+        this.name = parts[2];
+        this.description = parts[4];
+        this.status = Status.valueOf(parts[3]);
+        this.id = Integer.parseInt(parts[0]);
+    }
+
     public Task(String name, String description, Status status) {
         this.name = name;
         this.description = description;
@@ -32,10 +40,6 @@ public class Task {
         this.status = status;
     }
 
-    public Task(String name) {
-        this.name = name;
-        status = Status.NEW;
-    }
 
     public Task clone() {
         return new Task(this.name, this.description, this.status, this.id);
@@ -82,6 +86,10 @@ public class Task {
 
     public static boolean check(Task task) {
         return task != null && !task.getName().isEmpty();
+    }
+
+    public String toFileString() {
+        return String.format("%s,%s,%s,%s,%s\n", id, TaskType.TASK, name, status, description);
     }
 
     @Override

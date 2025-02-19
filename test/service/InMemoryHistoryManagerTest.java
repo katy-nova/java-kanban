@@ -1,7 +1,7 @@
 import model.Status;
 import model.Task;
 import org.junit.jupiter.api.Test;
-import service.HistoryManager;
+import service.history.HistoryManager;
 import service.Managers;
 
 import static org.junit.jupiter.api.Assertions.*;
