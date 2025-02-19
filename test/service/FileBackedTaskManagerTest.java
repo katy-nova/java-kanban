@@ -26,7 +26,6 @@ class FileBackedTaskManagerTest {
         manager.addTask(task1);
         manager.addTask(task2);
         manager.addTask(task3);
-        manager.save();
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(file);
         assertArrayEquals(manager.getTasks().toArray(), loadedManager.getTasks().toArray());
     }

@@ -12,7 +12,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         load(file); // при создании объекта автоматически выполняем загрузку данных
     }
 
-    public Task fromString(String taskString) throws ManagerSaveException {
+    private Task fromString(String taskString) throws ManagerSaveException {
         String[] data = taskString.split(",");
         try {
             TaskType taskType = TaskType.valueOf(data[1]);
@@ -37,7 +37,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    public void load(File file) throws ManagerSaveException {
+    private void load(File file) throws ManagerSaveException {
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             if (br.ready()) {
                 String line = br.readLine(); // читаем первую строку в которой нет задач
@@ -58,7 +58,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    public void save() throws ManagerSaveException {
+    private void save() throws ManagerSaveException {
         try (Writer fileWriter = new FileWriter(file)) {
             fileWriter.write("id,type,name,status,description,epicId\n");
             for (Task task : getTasks()) {

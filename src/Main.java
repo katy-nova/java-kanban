@@ -19,6 +19,5 @@ public class Main {
         manager.addTask(task1);
         manager.addEpic(epic);
         manager.addSubtask(subtask);
-        manager.save();
     }
 }
