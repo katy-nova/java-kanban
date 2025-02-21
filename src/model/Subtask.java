@@ -23,9 +23,28 @@ public class Subtask extends Task {
         this.epicId = epicId;
     }
 
+    public Subtask(String string) {
+        super(string);
+        String[] parts = string.split(",");
+        this.epicId = Integer.parseInt(parts[5]);
+    }
+
     public Subtask(String name, String description, int id, Status status, int epicId) {
         super(name, description, status, id);
         this.epicId = epicId;
+    }
+
+    @Override
+    public String toFileString() {
+        return String.format("%s,%s,%s,%s,%s,%s\n", id, TaskType.SUBTASK, name, status, description, epicId);
+    }
+
+    @Override
+    public String toString() {
+        return "model.Subtask{'name='" + name +
+                ", 'id'=" + id +
+                ", 'model.Status'=" + status +
+                ", 'epicID'=" + epicId + "}";
     }
 
     @Override

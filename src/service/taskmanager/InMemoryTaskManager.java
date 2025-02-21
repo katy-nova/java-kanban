@@ -1,22 +1,31 @@
-package service;
+package service.taskmanager;
 
 import model.Epic;
 import model.Status;
 import model.Subtask;
 import model.Task;
+import service.Managers;
+import service.history.HistoryManager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final HashMap<Integer, Task> tasks = new HashMap<>();
-    private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private final HashMap<Integer, Epic> epics = new HashMap<>();
+    protected final HashMap<Integer, Task> tasks = new HashMap<>();
+    protected final HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    protected final HashMap<Integer, Epic> epics = new HashMap<>();
     private static int count = 0;
     private final HistoryManager historyManager = Managers.getDefaultHistoryManager();
 
     public int addID() {
         count++;
+        return count;
+    }
+
+    public void setCount(int newCount) {
+        count = newCount;
+    }
+
+    public int getCount() {
         return count;
     }
 
@@ -179,6 +188,14 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.remove(id);
         }
 
+    }
+
+    public int findMaxID() { // метод, который находит максимальный айди, чтобы потом присвоить счетчику его значение
+        Set<Integer> ids = new HashSet<>();
+        ids.addAll(tasks.keySet());
+        ids.addAll(subtasks.keySet());
+        ids.addAll(epics.keySet());
+        return Collections.max(ids);
     }
 
     public void setEpicStatus(Epic epic) {
