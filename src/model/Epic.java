@@ -6,7 +6,8 @@ public class Epic extends Task {
     private final ArrayList<Integer> subtasks = new ArrayList<>();
 
     public Epic(String name, String description) {
-        super(name, description);
+        super(name, description, Status.NEW); // исправила, но у меня в конструкторе класса Task если статус не задан,
+        // то он автоматически присваивается как NEW
     }
 
     public Epic(String name, String description, Status status, int id) {

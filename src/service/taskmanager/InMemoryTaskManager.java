@@ -6,12 +6,13 @@ import model.Subtask;
 import model.Task;
 import service.Managers;
 import service.history.HistoryManager;
+
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final HashMap<Integer, Task> tasks = new HashMap<>();
-    private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private final HashMap<Integer, Epic> epics = new HashMap<>();
+    protected final HashMap<Integer, Task> tasks = new HashMap<>();
+    protected final HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    protected final HashMap<Integer, Epic> epics = new HashMap<>();
     private static int count = 0;
     private final HistoryManager historyManager = Managers.getDefaultHistoryManager();
 
@@ -36,9 +37,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addTask(Task task) {
         if (Task.check(task)) {
-            if (task.getID() == 0) {
-                task.setID(addID());
-            }
+            task.setID(addID());
             tasks.put(task.getID(), task);
         }
     }
@@ -46,9 +45,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addSubtask(Subtask subtask) {
         if (Subtask.check(subtask)) {
-            if (subtask.getID() == 0) {
-                subtask.setID(addID());
-            }
+            subtask.setID(addID());
             subtasks.put(subtask.getID(), subtask);
             if (epics.containsKey(subtask.getEpicId())) {
                 Epic epic = epics.get(subtask.getEpicId());
@@ -62,9 +59,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addEpic(Epic epic) {
         if (Epic.check(epic)) {
-            if (epic.getID() == 0) {
-                epic.setID(addID());
-            }
+            epic.setID(addID());
             epics.put(epic.getID(), epic);
         }
     }

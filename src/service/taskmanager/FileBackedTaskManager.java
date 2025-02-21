@@ -1,6 +1,7 @@
 package service.taskmanager;
 
 import model.*;
+
 import java.io.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -19,15 +20,21 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             switch (taskType) {
                 case TASK:
                     Task task = new Task(taskString);
-                    addTask(task); // сразу записываем в менеджер
+                    tasks.put(task.getID(), task); // сразу записываем в менеджер
                     return task;
                 case SUBTASK:
                     Subtask subtask = new Subtask(taskString);
-                    addSubtask(subtask);
+                    // не знаю, насколько необходима эта проверка, ведь условия считаются идеальными
+                    // но для профилактики исключений добавила
+                    if (epics.get(subtask.getEpicId()) != null) {
+                        subtasks.put(subtask.getID(), subtask);
+                        Epic epicForSubtask = epics.get(subtask.getEpicId());
+                        epicForSubtask.addSubtask(subtask.getID());
+                    }
                     return subtask;
                 case EPIC:
                     Epic epic = new Epic(taskString);
-                    addEpic(epic);
+                    epics.put(epic.getID(), epic);
                     return epic;
                 default:
                     return null;

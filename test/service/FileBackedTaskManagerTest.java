@@ -5,11 +5,15 @@ import org.junit.jupiter.api.Test;
 import service.taskmanager.FileBackedTaskManager;
 import static org.junit.jupiter.api.Assertions.*;
 import java.io.File;
+import java.io.IOException;
 
 class FileBackedTaskManagerTest {
 
-    File file = new File("src" + File.separator + "base" + File.separator + "base.csv");
-    FileBackedTaskManager manager = new FileBackedTaskManager(file);
+    File temp = File.createTempFile("prak", "csv");
+    FileBackedTaskManager manager = new FileBackedTaskManager(temp);
+
+    FileBackedTaskManagerTest() throws IOException {
+    }
 
     @Test
     void fromString() {
@@ -26,7 +30,7 @@ class FileBackedTaskManagerTest {
         manager.addTask(task1);
         manager.addTask(task2);
         manager.addTask(task3);
-        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(file);
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(temp);
         assertArrayEquals(manager.getTasks().toArray(), loadedManager.getTasks().toArray());
     }
 
