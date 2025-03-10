@@ -6,20 +6,22 @@ import model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.TreeSet;
 
 public interface TaskManager {
 
-    void addTask(Task task);
+    void addTask(Task task) throws IllegalStateException;
 
-    void addSubtask(Subtask subtask);
+    void addSubtask(Subtask subtask) throws IllegalStateException;
 
-    void addEpic(Epic epic);
+    void addEpic(Epic epic) throws IllegalStateException;
 
-    void updateTask(Task task);
+    void updateTask(Task task) throws IllegalStateException;
 
-    void updateSubtask(Subtask subtask);
+    void updateSubtask(Subtask subtask) throws IllegalStateException;
 
-    void updateEpic(Epic newEpic);
+    void updateEpic(Epic newEpic) throws IllegalStateException;
 
     void clearTasks();
 
@@ -33,11 +35,11 @@ public interface TaskManager {
 
     List<Epic> getEpics();
 
-    Task getTask(int id);
+    Optional<Task> getTask(int id);
 
-    Subtask getSubtask(int id);
+    Optional<Subtask> getSubtask(int id);
 
-    Epic getEpic(int id);
+    Optional<Epic> getEpic(int id);
 
     void deleteTask(int id);
 
@@ -47,4 +49,5 @@ public interface TaskManager {
 
     ArrayList<Task> getHistory();
 
+    TreeSet<Task> getPrioritizedTasks();
 }
