@@ -24,7 +24,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     // Метод для добавления элемента в конец списка
     private void linkLast(Task task) {
         Node newNode = new Node(null, task.clone(), null); // Создаем новый узел
-
         if (head == null) {
             head = newNode;   // новый узел становится и головой, и хвостом
             tail = newNode;
@@ -60,7 +59,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             node.getPrev().setNext(null); // предыдущий становится хвостом
             tail = node.getPrev();
         } else if (node.getNext() != null) { // если нет предыдущего
-            node.getPrev().setNext(null); // следующий становится головой
+            node.getNext().setPrev(null); // следующий становится головой
             head = node.getNext();
         } else { // если этот узел был единственный
             head = null;

@@ -3,6 +3,9 @@ package service.taskmanager;
 import model.*;
 
 import java.io.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -11,6 +14,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager(File file) throws ManagerSaveException {
         this.file = file;
         load(file); // при создании объекта автоматически выполняем загрузку данных
+    }
+
+    private void addTasksToSet() { // чтобы восстановить все задачи
+        List<? extends Task> list = Stream.of(tasks.values(), subtasks.values())
+                .flatMap(Collection::stream)
+                .filter(task -> task.getStartTime() != null)
+                .toList();
+        prioritisedTasks.addAll(list);
     }
 
     private Task fromString(String taskString) throws ManagerSaveException {
@@ -58,6 +69,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 fromString(br.readLine());
             }
             setCount(findMaxID()); // устанавливаем счетчик на значение максимального айди
+            addTasksToSet(); // добавляем все задачи в приоритетный список
         } catch (FileNotFoundException e) {
             throw new ManagerSaveException("Файл не найден");
         } catch (IOException e) {
@@ -67,7 +79,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() throws ManagerSaveException {
         try (Writer fileWriter = new FileWriter(file)) {
-            fileWriter.write("id,type,name,status,description,epicId\n");
+            fileWriter.write("id,type,name,status,description,duration,startTime,epicId\n");
             for (Task task : getTasks()) {
                 fileWriter.write(task.toFileString());
             }

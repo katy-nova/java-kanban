@@ -7,6 +7,8 @@ import model.Task;
 import service.Managers;
 import service.history.HistoryManager;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -15,6 +17,51 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Integer, Epic> epics = new HashMap<>();
     private static int count = 0;
     private final HistoryManager historyManager = Managers.getDefaultHistoryManager();
+    protected final TreeSet<Task> prioritisedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+    // не могу понять, почему при отсутвии реализации интерфеса comparable вылетает ошибка, ведь компаратор передан
+    // в конструктор:( (не хотела реализовывать этот интерфейс для времени, ведь может быть необходима и
+    // другая сортирровка, например по имени)
+
+    public boolean hasNoOverlap(Task task1, Task task2) {
+        if (task1.getStartTime().isBefore(task2.getStartTime())) { // узнаем какая задача начинается раньше
+            return !(task1.getEndTime().isAfter(task2.getEndTime()));
+            // используем отрицание потому что время конца предыдущей и начала следующей может быть равно
+        } else {
+            return !(task2.getEndTime().isBefore(task1.getEndTime()));
+        }
+    } // не знаю, насколько целесообразно использовать этот метод при валидации, ведь задачи уже заранее отсортированы
+    // поэтому не нужно так подробно сравнивать каждую (метод валидации написан без него)
+
+    public boolean validate(Task task) { // изменить модификатор
+        if (!Task.check(task)) { // если задача не имеет основных полей - сразу не пропускаем
+            return false;
+        }
+        if (prioritisedTasks.isEmpty() || task.getStartTime() == null && task.getDuration() == null) {
+            return true; // если в списке нет задач, или это задача без времени - вернем true
+        }
+        if (prioritisedTasks.first().getStartTime().isAfter(task.getEndTime()) ||
+                prioritisedTasks.last().getEndTime().isBefore(task.getStartTime())) {
+            return true;
+            // если задача заканчивается раньше самой первой или начинается позже самой последней, то сразу вернем true
+        }
+        return prioritisedTasks.stream()
+                // убираем все задачи, которые заканчиваются раньше начала заданной
+                .dropWhile(task1 -> !(task1.getEndTime().isAfter(task.getStartTime())))
+                // проверяем, что оставшиеся задачи начинаются позже конца заданной
+                .allMatch(task1 -> !(task1.getStartTime().isBefore(task.getEndTime())));
+        // не заменяю на nonMatch потому что мне кажется, так легче понимать код
+    }
+
+    protected void addTaskToSet(Task task) {
+        if (task.getStartTime() != null) {
+            prioritisedTasks.add(task);
+        }
+    }
+
+    @Override
+    public TreeSet<Task> getPrioritizedTasks() {
+        return new TreeSet<>(prioritisedTasks);
+    }
 
     public int addID() {
         count++;
@@ -35,56 +82,76 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addTask(Task task) {
-        if (Task.check(task)) {
+    public void addTask(Task task) throws IllegalStateException {
+        if (validate(task)) {
             task.setID(addID());
             tasks.put(task.getID(), task);
+            addTaskToSet(task); // сразу при добавлении задачи добавляем ее во временнОе множество
+        } else {
+            throw new IllegalArgumentException("Задача составлена некорректно");
         }
     }
 
     @Override
-    public void addSubtask(Subtask subtask) {
-        if (Subtask.check(subtask)) {
+    public void addSubtask(Subtask subtask) throws IllegalStateException {
+        if (validate(subtask)) {
             subtask.setID(addID());
             subtasks.put(subtask.getID(), subtask);
+            addTaskToSet(subtask);
             if (epics.containsKey(subtask.getEpicId())) {
+                // есть ли смысл менять на getEpic(subtask.getEpicId()).isPresent???
                 Epic epic = epics.get(subtask.getEpicId());
                 epic.addSubtask(subtask.getID());
                 setEpicStatus(epic);
+                setEpicTime(epic);
+            } else {
+                throw new IllegalArgumentException("Неверно указан epicId");
             }
+        } else {
+            throw new IllegalArgumentException("Задача составлена некорректно");
         }
     }
 
-
     @Override
-    public void addEpic(Epic epic) {
+    public void addEpic(Epic epic) throws IllegalStateException {
         if (Epic.check(epic)) {
             epic.setID(addID());
             epics.put(epic.getID(), epic);
+        } else {
+            throw new IllegalArgumentException("Задача составлена некорректно");
         }
     }
 
     @Override
-    public void updateTask(Task task) { //имея одинаковый id старая задача заменится новой
-        if (tasks.containsKey(task.getID())) {
+    public void updateTask(Task task) throws IllegalStateException { //имея одинаковый id старая задача заменится новой
+        if (tasks.containsKey(task.getID()) && Task.check(task)) {
             tasks.put(task.getID(), task);
+            addTaskToSet(task);
+        } else {
+            throw new IllegalArgumentException("Задача составлена некорректно");
         }
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
-        if (subtasks.containsKey(subtask.getID()) && epics.containsKey(subtask.getEpicId())) {
+    public void updateSubtask(Subtask subtask) throws IllegalStateException {
+        if (subtasks.containsKey(subtask.getID()) && epics.containsKey(subtask.getEpicId()) && Task.check(subtask)) {
             subtasks.put(subtask.getID(), subtask);//в эпике ничего перезаписывать не надо, тк id не изменился
+            addTaskToSet(subtask);
             setEpicStatus(epics.get(subtask.getEpicId()));
+            setEpicTime(epics.get(subtask.getEpicId()));
+        } else {
+            throw new IllegalArgumentException("Задача составлена некорректно");
         }
     }
 
     @Override
-    public void updateEpic(Epic newEpic) {
+    public void updateEpic(Epic newEpic) throws IllegalStateException {
         if (epics.containsKey(newEpic.getID())) {
             Epic epic = epics.get(newEpic.getID());
             epic.setName(newEpic.getName());
             epic.setDescription(newEpic.getDescription());
+        } else {
+            throw new IllegalArgumentException("Задача составлена некорректно");
         }
     }
 
@@ -92,8 +159,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void clearTasks() {
         if (!tasks.isEmpty()) {
             for (Integer id : tasks.keySet()) {
-                historyManager.remove(id); // не слишком ли усложняется метод с добавлением цикла?
+                historyManager.remove(id);
             }
+            prioritisedTasks.removeAll(tasks.values()); // удаляем все задачи из множества
             tasks.clear();
         }
     }
@@ -102,7 +170,6 @@ public class InMemoryTaskManager implements TaskManager {
     public void clearSubtasks() {
         if (!epics.isEmpty()) {
             for (Epic epic : epics.values()) { // очищаем каждый эпик
-                historyManager.remove(epic.getID());
                 epic.clearEpic();
                 epic.setStatus(Status.NEW);
             }
@@ -111,6 +178,7 @@ public class InMemoryTaskManager implements TaskManager {
             for (Integer id : subtasks.keySet()) {
                 historyManager.remove(id);
             }
+            prioritisedTasks.removeAll(subtasks.values());
             subtasks.clear(); // очищаем мапу
         }
     }
@@ -122,6 +190,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         if (!subtasks.isEmpty()) {
             subtasks.clear(); // удаляем все подзадачи
+            prioritisedTasks.addAll(subtasks.values());
         }
     }
 
@@ -141,25 +210,26 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTask(int id) {
+    public Optional<Task> getTask(int id) {
         historyManager.addTask(tasks.get(id));
-        return tasks.get(id);
+        return Optional.of(tasks.get(id));
     }
 
     @Override
-    public Subtask getSubtask(int id) {
+    public Optional<Subtask> getSubtask(int id) {
         historyManager.addTask(subtasks.get(id));
-        return subtasks.get(id);
+        return Optional.of(subtasks.get(id));
     }
 
     @Override
-    public Epic getEpic(int id) {
+    public Optional<Epic> getEpic(int id) {
         historyManager.addTask(epics.get(id));
-        return epics.get(id);
+        return Optional.of(epics.get(id));
     }
 
     @Override
     public void deleteTask(int id) {
+        prioritisedTasks.remove(tasks.get(id));
         tasks.remove(id);
         historyManager.remove(id);
     }
@@ -172,18 +242,20 @@ public class InMemoryTaskManager implements TaskManager {
             subtasks.remove(id);
             epic.deleteSubtask(id); // удаляем подзадачу из эпика
             setEpicStatus(epic);
+            setEpicTime(epic);
             historyManager.remove(id);
+            prioritisedTasks.remove(subtask);
         }
     }
 
     @Override
     public void deleteEpic(int id) {
         if (epics.containsKey(id)) {
-            ArrayList<Integer> subtasksIDs = epics.get(id).getSubtasks();
-            for (Integer subtaskId : subtasksIDs) {
-                subtasks.remove(subtaskId);
-                historyManager.remove(subtaskId);
-            }
+            epics.get(id).getSubtasks().stream()
+                    .peek(subtaskId -> prioritisedTasks.remove(subtasks.get(subtaskId)))
+                    .peek(historyManager::remove)
+                    .forEach(subtasks::remove);
+
             epics.remove(id);
             historyManager.remove(id);
         }
@@ -201,13 +273,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void setEpicStatus(Epic epic) {
         boolean isNew = true;
         boolean isDone = true;
-        int epicId = epic.getID();
-        ArrayList<Subtask> epicSubtasks = new ArrayList<>(); // создаем пустой список для задач нужного эпика
-        for (Subtask subtask : subtasks.values()) {
-            if (subtask.getEpicId() == epicId) {
-                epicSubtasks.add(subtask); //добвляем все подзадачи по id из мапы с подзадачами
-            }
-        }
+        List<Subtask> epicSubtasks = subtasks.values().stream()
+                .filter(subtask -> subtask.getEpicId() == epic.getID())
+                .toList();
         for (Subtask epicSubtask : epicSubtasks) {
             if (epicSubtask.getStatus() == Status.IN_PROGRESS) { // если хотя бы у 1 задачи статус "в процессе"
                 epic.setStatus(Status.IN_PROGRESS); // то весь эпик в статусе "в процессе"
@@ -226,6 +294,30 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setStatus(Status.NEW);
         } else {
             epic.setStatus(Status.DONE);
+        }
+    }
+
+    public void setEpicTime(Epic epic) {
+        Optional<LocalDateTime> endTime = subtasks.values().stream()
+                .filter(subtask -> subtask.getEpicId() == epic.getID())
+                .map(Task::getEndTime)
+                .sorted()
+                .reduce((a, b) -> b); // достаем последний элемент
+        endTime.ifPresent(epic::setEndTime);
+
+        Optional<LocalDateTime> startTime = subtasks.values().stream()
+                .filter(subtask -> subtask.getEpicId() == epic.getID())
+                .map(Task::getStartTime)
+                .sorted()
+                .findFirst();
+        startTime.ifPresent(epic::setStartTime);
+
+        if (endTime.isPresent() && startTime.isPresent()) {
+            Optional<Long> minutes = subtasks.values().stream()
+                    .filter(subtask -> subtask.getEpicId() == epic.getID())
+                    .map(subtask -> subtask.getDuration().toMinutes())
+                    .reduce(Long::sum);
+            minutes.ifPresent(minute -> epic.setDuration(Duration.ofMinutes(minute)));
         }
     }
 }
