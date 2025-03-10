@@ -89,6 +89,7 @@ public class Epic extends Task {
     @Override
     public Epic clone() {
         Epic epic = new Epic(this.name, this.description, this.status, this.id, this.duration, this.startTime);
+        epic.setEndTime(this.endTime);
         for (Integer subtask : subtasks) {
             epic.addSubtask(subtask);
         }

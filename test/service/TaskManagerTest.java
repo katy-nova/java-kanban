@@ -168,10 +168,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.updateTask(updatedTask);
         assertEquals(1, taskManager.getTasks().size(), "Неверное количество задач.");
         taskManager.getTask(task.getID());
-        assertEquals(2, taskManager.getHistory().size());
-        Task[] array1 = {subtask1, updatedTask};
+        assertTrue(taskManager.getEpic(epic.getID()).isPresent());
+        taskManager.getEpic(epic.getID()).get();
+        assertEquals(3, taskManager.getHistory().size());
+        Task[] array1 = {subtask1, updatedTask, epic};
         assertArrayEquals(array1, taskManager.getHistory().toArray());
         taskManager.deleteSubtask(subtask1.getID()); // удалили задачу
+        taskManager.deleteEpic(epic.getID());
         Task[] array2 = {updatedTask};
         assertArrayEquals(array2, taskManager.getHistory().toArray());
         taskManager.clearTasks();
