@@ -14,7 +14,7 @@ public class TimeTable {
     private final int year;
     private static final int INTERVALS_IN_DAY = 96;
     // не добавляла это в основную реализацию менеджера, потому что мне кажется, что хоть искать пересечения таким
-    // способом это все равно не совсем О1 (стрим по интервалам) да и вообще гораздо сложнее и требует много памяти.
+    // способом это все равно не совсем О1 (цикл по интервалам) да и вообще гораздо сложнее и требует много памяти.
     // Поскольку в 1 дне 96 интервалов, то продумала логику, что день заполняется интервалами только в тот момент,
     // когда в него кладут первую задачу, до это момента мапы дня пустые
     // но это все равно больше похоже на гусеницу Франкенштейна(
@@ -51,9 +51,10 @@ public class TimeTable {
         if (thisDay.isEmpty()) {
             throw new IllegalArgumentException("Задача не была добавлена в расписание");
         }
-        thisDay.entrySet().stream() // удаляя задачу заменяем все ее интервалы на 0
-                .filter(entry -> entry.getValue() == task.getID())
-                .forEach(entry -> entry.setValue(0));
+        int numberOfIntervals = Math.toIntExact((Duration.between(startTime, endTime).toMinutes() / 15));
+        for (int j = 0; j < numberOfIntervals; j++) {
+            thisDay.put(startTime.plusMinutes(j * 15L), 0);
+        }
     }
 
     public boolean addTaskToTable(Task task) {
@@ -78,20 +79,15 @@ public class TimeTable {
             thisDay = createDay(month.getMonthValue(), day);
         }
         // проверяем временные интервалы
-        // все равно приходится проходиться 2 раза по всему дню(
-        // по факту это константная сложность 0(196) (это если мы еще не создавали день) и это будет гораздо сложнее,
-        // чем в основной реализации
-        boolean hasConflict = thisDay.entrySet().stream()
-                .filter(entry -> entry.getKey().isBefore(endTime) && entry.getKey().plusMinutes(15).isAfter(startTime))
-                .anyMatch(entry -> entry.getValue() != 0);
-        // если занят хотя бы 1 интервал - вернем false
-        if (hasConflict) {
-            return false;
+        int numberOfIntervals = Math.toIntExact((Duration.between(startTime, endTime).toMinutes() / 15));
+        for (int i = 0; i < numberOfIntervals; i++) {
+            if (thisDay.get(startTime.plusMinutes(i * 15L)) != 0) {
+                return false; // если хотя бы 1 занят - вернется false
+            }
         }
-        // если все интервалы свободны - записываем туда нашу задачу
-        thisDay.entrySet().stream()
-                .filter(entry -> entry.getKey().isBefore(endTime) && entry.getKey().plusMinutes(15).isAfter(startTime))
-                .forEach(entry -> entry.setValue(task.getID()));
+        for (int j = 0; j < numberOfIntervals; j++) {
+            thisDay.put(startTime.plusMinutes(j * 15L), task.getID());
+        }
         return true;
     }
 
