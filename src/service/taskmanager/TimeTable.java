@@ -12,7 +12,7 @@ public class TimeTable {
     public final Map<YearMonth, Map<Integer, Map<LocalDateTime, Integer>>> timeTable = new HashMap<>(12);
     // храним в мапе ID задачи, которая занимает этот временной отрезок
     private final int year;
-    private final static int INTERVALS_IN_DAY = 96;
+    private static final int INTERVALS_IN_DAY = 96;
     // не добавляла это в основную реализацию менеджера, потому что мне кажется, что хоть искать пересечения таким
     // способом это все равно не совсем О1 (стрим по интервалам) да и вообще гораздо сложнее и требует много памяти.
     // Поскольку в 1 дне 96 интервалов, то продумала логику, что день заполняется интервалами только в тот момент,
