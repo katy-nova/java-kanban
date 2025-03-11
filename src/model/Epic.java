@@ -44,13 +44,12 @@ public class Epic extends Task {
     }
 
     public void deleteSubtask(int id) {
-        for (int i = 0; i < subtasks.size(); i++) { // есть ли необходимость заменять этот цикл на стрим?
+        for (int i = 0; i < subtasks.size(); i++) {
             if (subtasks.get(i) == id) {
                 subtasks.remove(i);
                 break;
             }
         }
-        // цикл прервется при нахождении нужного айди, а стрим будет проходить весь список
     }
 
     public void clearEpic() {

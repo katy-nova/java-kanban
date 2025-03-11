@@ -5,11 +5,24 @@ import service.taskmanager.TimeTable;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TimeTableTest {
     TimeTable timeTable = new TimeTable(2025);
+
+    @Test
+    void shouldAddDayInTimeTable() {
+        Task task = new Task("Tes1", "Test addNewTask description", Status.NEW, 1,
+                Duration.ofMinutes(60), LocalDateTime.of(2025, 3, 31, 13, 30));
+        timeTable.addTaskToTable(task);
+        Map<YearMonth, Map<Integer, Map<LocalTime, Integer>>> map = timeTable.getTimeTable();
+        assertEquals(map.get(YearMonth.of(2025, 3)).get(31)
+                .get(LocalTime.of(13, 30)), task.getID());
+    }
 
     @Test
     void addTaskToTable() {

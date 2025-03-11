@@ -18,9 +18,6 @@ public class InMemoryTaskManager implements TaskManager {
     private static int count = 0;
     private final HistoryManager historyManager = Managers.getDefaultHistoryManager();
     protected final TreeSet<Task> prioritisedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
-    // не могу понять, почему при отсутвии реализации интерфеса comparable вылетает ошибка, ведь компаратор передан
-    // в конструктор:( (не хотела реализовывать этот интерфейс для времени, ведь может быть необходима и
-    // другая сортирровка, например по имени)
 
     public boolean hasNoOverlap(Task task1, Task task2) {
         if (task1.getStartTime().isBefore(task2.getStartTime())) { // узнаем какая задача начинается раньше
@@ -29,10 +26,9 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             return !(task2.getEndTime().isBefore(task1.getEndTime()));
         }
-    } // не знаю, насколько целесообразно использовать этот метод при валидации, ведь задачи уже заранее отсортированы
-    // поэтому не нужно так подробно сравнивать каждую (метод валидации написан без него)
+    }
 
-    public boolean validate(Task task) { // изменить модификатор
+    private boolean validate(Task task) {
         if (!Task.check(task)) { // если задача не имеет основных полей - сразу не пропускаем
             return false;
         }
@@ -59,8 +55,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public TreeSet<Task> getPrioritizedTasks() {
-        return new TreeSet<>(prioritisedTasks);
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(prioritisedTasks);
     }
 
     public int addID() {
@@ -99,7 +95,6 @@ public class InMemoryTaskManager implements TaskManager {
             subtasks.put(subtask.getID(), subtask);
             addTaskToSet(subtask);
             if (epics.containsKey(subtask.getEpicId())) {
-                // есть ли смысл менять на getEpic(subtask.getEpicId()).isPresent???
                 Epic epic = epics.get(subtask.getEpicId());
                 epic.addSubtask(subtask.getID());
                 setEpicStatus(epic);
@@ -270,7 +265,7 @@ public class InMemoryTaskManager implements TaskManager {
         return Collections.max(ids);
     }
 
-    public void setEpicStatus(Epic epic) {
+    private void setEpicStatus(Epic epic) {
         boolean isNew = true;
         boolean isDone = true;
         List<Subtask> epicSubtasks = subtasks.values().stream()
@@ -297,7 +292,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    public void setEpicTime(Epic epic) {
+    private void setEpicTime(Epic epic) {
         Optional<LocalDateTime> endTime = subtasks.values().stream()
                 .filter(subtask -> subtask.getEpicId() == epic.getID())
                 .map(Task::getEndTime)
