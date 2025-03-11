@@ -9,7 +9,7 @@ import java.util.TreeMap;
 import java.util.stream.IntStream;
 
 public class TimeTable {
-    public final Map<YearMonth, Map<Integer, Map<LocalTime, Integer>>> timeTable = new HashMap<>(12);
+    private final Map<YearMonth, Map<Integer, Map<LocalTime, Integer>>> timeTable = new HashMap<>(12);
     // храним в мапе ID задачи, которая занимает этот временной отрезок
     private final int year;
     private static final int INTERVALS_IN_DAY = 96;
